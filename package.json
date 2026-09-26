@@ -1,0 +1,13 @@
+{
+  "name": "ai-orchestrator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Orchestrator - Intelligent Business Workflow Orchestration Platform",
+  "scripts": {
+    "install:all": "cd server && cmd /c npm install && cd ../client && cmd /c npm install",
+    "dev": "cmd /c npm run dev:server & cmd /c npm run dev:client",
+    "dev:server": "cd server && cmd /c npm run dev",
+    "dev:client": "cd client && cmd /c npm run dev",
+    "build": "cd server && cmd /c npm run build && cd ../client && cmd /c npm run build"
+  }
+}
