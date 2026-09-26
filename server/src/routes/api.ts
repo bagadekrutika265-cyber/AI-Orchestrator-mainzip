@@ -4,6 +4,20 @@ import { OrchestrationEngine } from '../engine/orchestrator.js';
 import { AIService } from '../ai/aiService.js';
 import { SimulatorEngine } from '../engine/simulators.js';
 import { WORKFLOW_TEMPLATES } from '../workflows/definitions.js';
+import {
+  clearSession,
+  consumeResetToken,
+  createResetToken,
+  createSession,
+  getSessionUserId,
+  hashPassword,
+  isSupportedRole,
+  requireAuth,
+  roleCanApprove,
+  safeUser,
+  verifyPassword,
+} from '../auth.js';
+import { LanguageCode, supportedLanguages } from '../localization.js';
 
 const router = Router();
 
@@ -19,20 +33,125 @@ router.get('/health', (req: Request, res: Response) => {
   });
 });
 
+// Public authentication endpoints
+router.get('/auth/me', (req: Request, res: Response) => {
+  const userId = getSessionUserId(req);
+  const user = userId ? db.users.find((candidate) => candidate.id === userId) : undefined;
+  if (!user) {
+    res.json({ authenticated: false });
+    return;
+  }
+  res.json({ authenticated: true, user: safeUser(user) });
+});
+
+router.post('/auth/login', (req: Request, res: Response) => {
+  const { username, password, role, rememberMe } = req.body as {
+    username?: string;
+    password?: string;
+    role?: string;
+    rememberMe?: boolean;
+  };
+  const user = db.users.find((candidate) => candidate.email.toLowerCase() === String(username || '').trim().toLowerCase());
+  if (!user || !user.passwordHash || !password || !verifyPassword(password, user.passwordHash)) {
+    res.status(401).json({ error: 'Invalid username or password.', code: 'INVALID_CREDENTIALS' });
+    return;
+  }
+  if (!isSupportedRole(role || '') || user.role !== role) {
+    res.status(403).json({ error: `Your account does not have ${String(role || 'selected')} access.`, code: 'ROLE_MISMATCH' });
+    return;
+  }
+  createSession(res, user.id, Boolean(rememberMe));
+  res.json({ success: true, user: safeUser(user) });
+});
+
+router.post('/auth/google-demo', (req: Request, res: Response) => {
+  const user = db.users[2];
+  createSession(res, user.id, true);
+  res.json({ success: true, demo: true, user: safeUser(user) });
+});
+
+router.post('/auth/logout', (req: Request, res: Response) => {
+  clearSession(req, res);
+  res.json({ success: true });
+});
+
+router.post('/auth/forgot-password', (req: Request, res: Response) => {
+  const username = String(req.body?.username || '').trim().toLowerCase();
+  const user = db.users.find((candidate) => candidate.email.toLowerCase() === username);
+  // Keep the response useful in demo mode without claiming an email was sent.
+  if (!user) {
+    res.status(404).json({ error: 'User not found. Try again.', code: 'USER_NOT_FOUND' });
+    return;
+  }
+  const token = createResetToken(user.id);
+  res.json({
+    success: true,
+    demo: true,
+    message: 'Demo reset link generated.',
+    resetToken: process.env.NODE_ENV === 'production' ? undefined : token,
+  });
+});
+
+router.post('/auth/reset-password', (req: Request, res: Response) => {
+  const { token, password, confirmPassword } = req.body as {
+    token?: string;
+    password?: string;
+    confirmPassword?: string;
+  };
+  if (!token || !password || password.length < 8) {
+    res.status(400).json({ error: 'Password must be at least 8 characters.' });
+    return;
+  }
+  if (password !== confirmPassword) {
+    res.status(400).json({ error: 'Passwords do not match.' });
+    return;
+  }
+  const userId = consumeResetToken(token);
+  const user = userId ? db.users.find((candidate) => candidate.id === userId) : undefined;
+  if (!user) {
+    res.status(400).json({ error: 'This reset link is invalid or expired.' });
+    return;
+  }
+  user.passwordHash = hashPassword(password);
+  res.json({ success: true, message: 'Password updated. You can now sign in.' });
+});
+
+// Everything below this point requires an authenticated session.
+router.use(requireAuth);
+
+router.get('/auth/preferences', (req: Request, res: Response) => {
+  const userId = getSessionUserId(req);
+  const user = db.users.find((candidate) => candidate.id === userId);
+  res.json({ language: user?.language || 'en' });
+});
+
+router.patch('/auth/preferences', (req: Request, res: Response) => {
+  const language = req.body?.language as LanguageCode;
+  const userId = getSessionUserId(req);
+  const user = db.users.find((candidate) => candidate.id === userId);
+  if (!user || !supportedLanguages.includes(language)) {
+    res.status(400).json({ error: 'Unsupported language preference.' });
+    return;
+  }
+  user.language = language;
+  res.json({ success: true, language });
+});
+
 // Users / Roles
 router.get('/users', (req: Request, res: Response) => {
-  res.json(db.users);
+  res.json(db.users.map(safeUser));
 });
 
 // Submit natural language request -> Creates & Starts Workflow
 router.post('/requests', async (req: Request, res: Response) => {
   try {
-    const { requestText, requesterId } = req.body;
+    const { requestText, requesterId, language } = req.body;
     if (!requestText) {
       res.status(400).json({ error: 'requestText is required' });
       return;
     }
-    const workflow = await OrchestrationEngine.createWorkflowFromRequest(requestText, requesterId);
+    const sessionUserId = getSessionUserId(req);
+    const workflow = await OrchestrationEngine.createWorkflowFromRequest(requestText, requesterId || sessionUserId || undefined, language || 'en');
     res.status(201).json({ success: true, workflow });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -56,8 +175,14 @@ router.get('/workflows/:id', (req: Request, res: Response) => {
 // Workflow Actions: Approve
 router.post('/workflows/:id/approve', (req: Request, res: Response) => {
   try {
+    const sessionUserId = getSessionUserId(req);
+    const actingUser = db.users.find((candidate) => candidate.id === sessionUserId);
+    if (!actingUser || !roleCanApprove(actingUser.role)) {
+      res.status(403).json({ error: 'Manager or Admin access is required to approve workflows.', code: 'ROLE_FORBIDDEN' });
+      return;
+    }
     const { approverName, comments } = req.body;
-    const wf = OrchestrationEngine.approveWorkflow(req.params.id, approverName, comments);
+    const wf = OrchestrationEngine.approveWorkflow(req.params.id, actingUser.name || approverName, comments);
     res.json({ success: true, workflow: wf });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -67,8 +192,14 @@ router.post('/workflows/:id/approve', (req: Request, res: Response) => {
 // Workflow Actions: Reject
 router.post('/workflows/:id/reject', (req: Request, res: Response) => {
   try {
+    const sessionUserId = getSessionUserId(req);
+    const actingUser = db.users.find((candidate) => candidate.id === sessionUserId);
+    if (!actingUser || !roleCanApprove(actingUser.role)) {
+      res.status(403).json({ error: 'Manager or Admin access is required to reject workflows.', code: 'ROLE_FORBIDDEN' });
+      return;
+    }
     const { approverName, reason } = req.body;
-    const wf = OrchestrationEngine.rejectWorkflow(req.params.id, approverName, reason);
+    const wf = OrchestrationEngine.rejectWorkflow(req.params.id, actingUser.name || approverName, reason);
     res.json({ success: true, workflow: wf });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -127,16 +258,16 @@ router.post('/templates', (req: Request, res: Response) => {
 
 // AI NLP Understanding Test
 router.post('/ai/understand', async (req: Request, res: Response) => {
-  const { requestText } = req.body;
-  const result = await AIService.processRequest(requestText || 'I need a new laptop');
+  const { requestText, language } = req.body;
+  const result = await AIService.processRequest(requestText || 'I need a new laptop', language || 'en');
   res.json(result);
 });
 
 // What-If Simulator Endpoint
 router.post('/ai/what-if', (req: Request, res: Response) => {
-  const { question } = req.body;
+  const { question, language } = req.body;
   const prediction = SimulatorEngine.runWhatIf(question || 'What if customer does not respond?');
-  res.json(prediction);
+  res.json({ ...prediction, language: language || 'en' });
 });
 
 // Digital Twin Pre-Execution Simulation Endpoint

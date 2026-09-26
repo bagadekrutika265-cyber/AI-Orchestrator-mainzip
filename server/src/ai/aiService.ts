@@ -1,5 +1,6 @@
 import { RequestUnderstandingEngine } from '../engine/understanding.js';
 import { UnderstandingResult } from '../types.js';
+import { LanguageCode } from '../localization.js';
 
 export class AIService {
   public static getMode(): 'LIVE_AI_MODE' | 'DEMO_MODE' {
@@ -9,7 +10,7 @@ export class AIService {
     return 'DEMO_MODE';
   }
 
-  public static async processRequest(requestText: string): Promise<UnderstandingResult> {
+  public static async processRequest(requestText: string, language: LanguageCode = 'en'): Promise<UnderstandingResult> {
     const mode = this.getMode();
     console.log(`[AI Service] Processing request in ${mode}...`);
 
@@ -56,6 +57,6 @@ export class AIService {
     }
 
     // Fallback to deterministic, reliable Demo Engine
-    return RequestUnderstandingEngine.understand(requestText);
+    return RequestUnderstandingEngine.understand(requestText, language);
   }
 }

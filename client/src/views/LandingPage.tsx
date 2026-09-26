@@ -1,17 +1,21 @@
 import React from 'react';
 import { Cpu, ArrowRight, Play, Sparkles, CheckCircle2, ShieldCheck, GitMerge, RefreshCw, Zap } from 'lucide-react';
+import { useI18n } from '../i18n';
 
 interface LandingPageProps {
   onStartWorkflow: () => void;
   onRunDemo: () => void;
   onExploreWorkflows: () => void;
+  onLogin: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onStartWorkflow,
   onRunDemo,
   onExploreWorkflows,
+  onLogin,
 }) => {
+  const { t } = useI18n();
   return (
     <div className="space-y-12 pb-16">
       {/* Hero Section */}
@@ -28,25 +32,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </h1>
 
         <p className="mt-3 text-xl font-bold bg-gradient-to-r from-brand-300 via-indigo-200 to-cyan-300 bg-clip-text text-transparent">
-          "From Business Request to Intelligent Action."
+          "{t('landing.tagline')}"
         </p>
 
         <p className="mt-2 text-xs font-mono uppercase tracking-widest text-gray-400">
-          Understand. Plan. Execute. Adapt.
+           {t('landing.secondary')}
         </p>
 
         <p className="mt-6 text-base text-gray-300 max-w-2xl mx-auto leading-relaxed">
-          AI Orchestrator transforms natural-language business requests into intelligent, multi-step, adaptive workflows. It gathers context from multiple data sources, enforces business policy, involves humans for key decisions, handles failures gracefully, and dynamically re-plans when conditions change.
+           {t('landing.description')}
         </p>
 
         {/* CTA Buttons */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <button
+            onClick={onLogin}
+            className="flex items-center gap-2 rounded-xl border border-brand-400/50 bg-brand-500/10 px-6 py-3.5 text-sm font-bold text-brand-100 transition-all duration-200 hover:scale-105 hover:bg-brand-500/20"
+          >
+            <ShieldCheck className="h-4 w-4" />
+            <span>{t('landing.login')}</span>
+          </button>
+          <button
             onClick={onStartWorkflow}
             className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 text-white font-bold text-sm shadow-xl shadow-brand-600/30 hover:scale-105 transition-all duration-200"
           >
             <Cpu className="w-4 h-4" />
-            <span>TRY AI ORCHESTRATOR</span>
+             <span>{t('landing.try')}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
@@ -55,14 +66,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow-xl shadow-emerald-500/20 hover:scale-105 transition-all duration-200"
           >
             <Play className="w-4 h-4 fill-current" />
-            <span>RUN LIVE DEMO</span>
+             <span>{t('landing.demo')}</span>
           </button>
 
           <button
             onClick={onExploreWorkflows}
             className="px-6 py-3.5 rounded-xl bg-dark-card border border-dark-border text-gray-200 hover:text-white font-bold text-sm hover:bg-dark-hover transition-all"
           >
-            EXPLORE 10 WORKFLOWS
+             {t('landing.explore')}
           </button>
         </div>
       </section>
@@ -70,8 +81,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Animated Orchestration Graph Preview */}
       <section className="bg-dark-card border border-dark-border rounded-2xl p-6 shadow-xl space-y-6">
         <div className="text-center space-y-2">
-          <h2 className="text-lg font-bold text-white uppercase tracking-wider">Dynamic Orchestration Pipeline</h2>
-          <p className="text-xs text-gray-400">How AI Orchestrator transforms natural language into verified resolution</p>
+           <h2 className="text-lg font-bold text-white uppercase tracking-wider">{t('landing.pipeline')}</h2>
+           <p className="text-xs text-gray-400">{t('landing.pipelineDescription')}</p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-9 gap-2 text-center text-xs">
@@ -94,6 +105,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
             );
           })}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-brand-500/20 bg-gradient-to-r from-brand-950/30 via-dark-card to-purple-950/20 p-6 shadow-xl">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-white">{t('landing.multilingualTitle')}</h2>
+            <p className="mt-2 max-w-2xl text-sm text-gray-400">{t('landing.multilingualDescription')}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-gray-200 sm:grid-cols-4">
+            {[
+              ['🇬🇧', 'Recover overdue invoice.', 'Invoice & Payment Recovery'],
+              ['🇮🇳', 'लंबित चालान का भुगतान प्राप्त करें।', 'Invoice & Payment Recovery'],
+              ['🇮🇳', 'थकीत चलनाचे पेमेंट वसूल करा.', 'Invoice & Payment Recovery'],
+              ['🇪🇸', 'Recuperar el pago atrasado.', 'Invoice & Payment Recovery'],
+            ].map(([flag, request, result]) => (
+              <div key={request} className="rounded-xl border border-dark-border bg-dark-base/80 p-3">
+                <div className="text-lg">{flag}</div>
+                <p className="mt-2 line-clamp-2 text-[11px] text-gray-300">{request}</p>
+                <p className="mt-2 text-[10px] text-emerald-300">{result}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

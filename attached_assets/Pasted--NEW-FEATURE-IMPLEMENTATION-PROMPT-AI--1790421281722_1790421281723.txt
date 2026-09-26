@@ -1,0 +1,1542 @@
+============================================================
+NEW FEATURE IMPLEMENTATION PROMPT
+AI ORCHESTRATOR
+============================================================
+
+I already have a working project called:
+
+# AI ORCHESTRATOR
+
+Tagline:
+"From Business Request to Intelligent Action"
+
+I now want to ADD two major features to the existing project:
+
+FEATURE 1:
+MULTILINGUAL AI ORCHESTRATOR
+
+FEATURE 2:
+SEPARATE SECURE LOGIN PAGE AFTER LANDING PAGE
+
+IMPORTANT:
+These are ADDITIONS to the existing project.
+
+DO NOT remove, replace, simplify, or break any existing features.
+
+First inspect the current project and understand the existing architecture, frontend, backend, authentication, routing, database, workflow engine, AI services, components, and styling.
+
+Then implement these features properly and integrate them with the existing system.
+
+============================================================
+FEATURE 1 — MULTILINGUAL AI ORCHESTRATOR
+============================================================
+
+The AI ORCHESTRATOR platform should support multiple languages.
+
+The purpose is to allow users from different regions and language backgrounds to interact with the workflow automation platform in their preferred language.
+
+The multilingual feature should work across the application, not just on the landing page.
+
+------------------------------------------------------------
+1. LANGUAGE SELECTOR
+------------------------------------------------------------
+
+Add a clearly visible language selector.
+
+It can be placed in:
+
+- Landing page navbar
+- Login page
+- Main application navbar/header
+- User settings
+
+Use a clean dropdown.
+
+Example:
+
+🌐 Language
+
+English
+हिन्दी — Hindi
+मराठी — Marathi
+বাংলা — Bengali
+தமிழ் — Tamil
+తెలుగు — Telugu
+ગુજરાતી — Gujarati
+ಕನ್ನಡ — Kannada
+Español — Spanish
+Français — French
+
+At minimum, implement these languages:
+
+1. English
+2. Hindi
+3. Marathi
+4. Spanish
+
+The architecture should make it easy to add additional languages later.
+
+Do not hardcode language switching separately into every component.
+
+Create a centralized internationalization/localization system.
+
+------------------------------------------------------------
+2. INTERNATIONALIZATION ARCHITECTURE
+------------------------------------------------------------
+
+Use a proper i18n architecture.
+
+If the project uses React, use an appropriate localization approach such as:
+
+react-i18next / i18next
+
+or another clean existing i18n solution compatible with the current project.
+
+Create translation files such as:
+
+locales/
+    en/
+        translation.json
+    hi/
+        translation.json
+    mr/
+        translation.json
+    es/
+        translation.json
+
+Do NOT scatter translated strings throughout the source code.
+
+Use translation keys.
+
+Example:
+
+t("dashboard.title")
+
+t("commandCenter.startWorkflow")
+
+t("requestInbox.title")
+
+------------------------------------------------------------
+3. TRANSLATE THE COMPLETE UI
+------------------------------------------------------------
+
+The language switcher should translate the visible application UI.
+
+Translate:
+
+Landing Page
+Navbar
+Hero Section
+Buttons
+Login
+Forgot Password
+Dashboard
+Sidebar
+AI Command Center
+Request Inbox
+Workflow Visualizer
+Workflow Templates
+Custom Workflow
+Data Sources
+Analytics
+Audit Trail
+What-if Simulator
+Notifications
+Settings
+Profile
+Approval screens
+Workflow status
+SLA information
+Error messages
+Success messages
+Loading messages
+Empty states
+Form labels
+Tooltips
+Modal dialogs
+Confirmation dialogs
+
+Do not translate only a few labels.
+
+The feature should feel like a real multilingual product.
+
+------------------------------------------------------------
+4. LANDING PAGE TRANSLATION
+------------------------------------------------------------
+
+The landing page should support language switching.
+
+Example:
+
+English:
+
+AI ORCHESTRATOR
+From Business Request to Intelligent Action
+
+Hindi:
+
+AI ORCHESTRATOR
+व्यावसायिक अनुरोध से बुद्धिमान कार्रवाई तक
+
+Marathi:
+
+AI ORCHESTRATOR
+व्यावसायिक विनंतीपासून बुद्धिमान कृतीपर्यंत
+
+Spanish:
+
+AI ORCHESTRATOR
+De la solicitud empresarial a la acción inteligente
+
+Keep the product name:
+
+AI ORCHESTRATOR
+
+unchanged.
+
+------------------------------------------------------------
+5. LOGIN PAGE TRANSLATION
+------------------------------------------------------------
+
+The login page must also change language.
+
+Example:
+
+English:
+Sign In
+Username
+Password
+Forgot Password?
+Sign In
+Sign in with Google
+
+Hindi:
+साइन इन
+उपयोगकर्ता नाम
+पासवर्ड
+पासवर्ड भूल गए?
+साइन इन करें
+Google से साइन इन करें
+
+Marathi:
+साइन इन
+वापरकर्ता नाव
+पासवर्ड
+पासवर्ड विसरलात?
+साइन इन करा
+Google ने साइन इन करा
+
+Spanish:
+Iniciar sesión
+Nombre de usuario
+Contraseña
+¿Olvidaste tu contraseña?
+Iniciar sesión
+Iniciar sesión con Google
+
+------------------------------------------------------------
+6. AI COMMAND CENTER MULTILINGUAL INPUT
+------------------------------------------------------------
+
+This is extremely important.
+
+The user should be able to enter a business request in their selected language.
+
+Examples:
+
+English:
+
+"Recover overdue invoice INV-1024."
+
+Hindi:
+
+"INV-1024 का लंबित भुगतान प्राप्त करें।"
+
+Marathi:
+
+"INV-1024 चे थकीत पेमेंट वसूल करा."
+
+Spanish:
+
+"Recuperar el pago atrasado de la factura INV-1024."
+
+The system should understand the request and map it to the same workflow.
+
+For example:
+
+Hindi request
+        ↓
+Language Detection
+        ↓
+Intent Understanding
+        ↓
+Workflow Classification
+        ↓
+Invoice & Payment Recovery
+        ↓
+Workflow Execution
+
+The internal workflow engine can continue using a standardized internal representation.
+
+------------------------------------------------------------
+7. LANGUAGE DETECTION
+------------------------------------------------------------
+
+Support two possibilities:
+
+A. User-selected language
+
+B. Automatic language detection
+
+If the user writes a request in another supported language, detect it where practical.
+
+Display:
+
+Detected Language:
+Marathi
+
+AI Confidence:
+95%
+
+Then process the request.
+
+If automatic detection is uncertain, allow the user to manually select the language.
+
+------------------------------------------------------------
+8. AI RESPONSE LANGUAGE
+------------------------------------------------------------
+
+The AI response should preferably be returned in the user's selected language.
+
+Example:
+
+User selects Marathi.
+
+AI response:
+
+"तुमची विनंती समजली आहे."
+
+"ही Invoice & Payment Recovery workflow म्हणून ओळखली गेली आहे."
+
+"प्राधान्य: उच्च"
+
+"पुढील कृती: Finance Manager ची मंजुरी आवश्यक आहे."
+
+If user changes language to English:
+
+"Your request has been understood."
+
+"This has been classified as an Invoice & Payment Recovery workflow."
+
+"Priority: High"
+
+"Next Action: Finance Manager approval is required."
+
+The underlying workflow state must remain the same.
+
+Only the presentation language changes.
+
+------------------------------------------------------------
+9. MULTILINGUAL WORKFLOW STATUS
+------------------------------------------------------------
+
+Workflow statuses should also be translated.
+
+For example:
+
+English:
+Running
+Waiting for Approval
+Failed
+Replanned
+Resolved
+
+Hindi:
+चल रहा है
+अनुमोदन की प्रतीक्षा
+विफल
+पुनः योजना बनाई गई
+समाधान किया गया
+
+Marathi:
+कार्यरत
+मंजुरीची प्रतीक्षा
+अयशस्वी
+पुन्हा नियोजन केले
+निराकरण झाले
+
+Spanish:
+En ejecución
+Esperando aprobación
+Fallido
+Replanificado
+Resuelto
+
+The internal status values should remain standardized.
+
+For example:
+
+RUNNING
+WAITING_FOR_APPROVAL
+FAILED
+REPLANNED
+RESOLVED
+
+Only the UI labels should be translated.
+
+------------------------------------------------------------
+10. MULTILINGUAL NOTIFICATIONS
+------------------------------------------------------------
+
+Notifications should respect the selected language.
+
+Examples:
+
+English:
+
+"Manager approval is required for this request."
+
+Hindi:
+
+"इस अनुरोध के लिए मैनेजर की मंजूरी आवश्यक है।"
+
+Marathi:
+
+"या विनंतीसाठी मॅनेजरची मंजुरी आवश्यक आहे."
+
+Spanish:
+
+"Se requiere la aprobación del gerente para esta solicitud."
+
+------------------------------------------------------------
+11. LANGUAGE PREFERENCE STORAGE
+------------------------------------------------------------
+
+Remember the user's selected language.
+
+Store the preference using the appropriate existing user settings mechanism.
+
+For demo/local mode:
+
+localStorage can be used.
+
+For authenticated users:
+
+prefer storing language preference in the user profile/database.
+
+When the user logs in again, restore their preferred language.
+
+------------------------------------------------------------
+12. LANGUAGE SWITCHING
+------------------------------------------------------------
+
+Changing language should NOT:
+
+- Log the user out
+- Reset workflow
+- Delete data
+- Refresh unnecessarily
+- Create a new request
+
+It should simply update the UI language.
+
+If the user is currently viewing:
+
+Invoice Recovery Request INV-1024
+
+and switches:
+
+English → Marathi
+
+the same request should remain open.
+
+Only the UI language changes.
+
+------------------------------------------------------------
+13. MULTILINGUAL AI ARCHITECTURE
+------------------------------------------------------------
+
+Create a clean architecture:
+
+User Input
+    ↓
+Language Detection
+    ↓
+Translation / Normalization Layer
+    ↓
+AI Request Understanding
+    ↓
+Workflow Engine
+    ↓
+Decision Engine
+    ↓
+Action Execution
+    ↓
+Response Localization
+    ↓
+User
+
+Important:
+
+Do not create separate workflow engines for different languages.
+
+There must be ONE common workflow engine.
+
+Languages are only an interaction/localization layer.
+
+------------------------------------------------------------
+14. FALLBACK LANGUAGE
+------------------------------------------------------------
+
+English should be the default fallback language.
+
+If a translation key is missing:
+
+Do not show:
+
+undefined
+
+or
+
+missing key
+
+Instead:
+
+1. Try selected language
+2. If missing → English
+3. Display English safely
+
+Log missing translation keys during development.
+
+------------------------------------------------------------
+15. MULTILINGUAL DEMO
+------------------------------------------------------------
+
+Add a small multilingual demo section to the landing page.
+
+Example:
+
+"Try AI Orchestrator in your language."
+
+Show:
+
+🇬🇧 English
+🇮🇳 Hindi
+🇮🇳 Marathi
+🇪🇸 Spanish
+
+Demonstrate the same workflow request being understood in different languages.
+
+Example:
+
+English:
+"Recover overdue invoice."
+
+Hindi:
+"लंबित चालान का भुगतान प्राप्त करें।"
+
+Marathi:
+"थकीत चलनाचे पेमेंट वसूल करा."
+
+All should result in:
+
+Invoice & Payment Recovery
+
+This will demonstrate that multilingual input does not create separate workflows.
+
+============================================================
+FEATURE 2 — SEPARATE SECURE LOGIN PAGE
+============================================================
+
+I want a dedicated login page AFTER the landing page.
+
+The landing page should NOT directly contain the complete login form.
+
+The user flow must be:
+
+LANDING PAGE
+        ↓
+LOGIN / GET STARTED
+        ↓
+DEDICATED LOGIN PAGE
+        ↓
+ROLE SELECTION
+        ↓
+USERNAME + PASSWORD
+        ↓
+AUTHENTICATION
+        ↓
+ROLE-BASED DASHBOARD
+
+This is required for better privacy, security, and cleaner UX.
+
+------------------------------------------------------------
+16. LANDING PAGE LOGIN BUTTON
+------------------------------------------------------------
+
+On the landing page, show:
+
+LOGIN
+
+and optionally:
+
+GET STARTED
+
+When the user clicks:
+
+LOGIN
+
+navigate to:
+
+/login
+
+or the equivalent route used by the existing application.
+
+Do NOT open a giant login form directly inside the landing page.
+
+The login page must be a separate page/screen.
+
+------------------------------------------------------------
+17. DEDICATED LOGIN PAGE DESIGN
+------------------------------------------------------------
+
+Create a premium login page consistent with the existing AI ORCHESTRATOR design.
+
+Use the existing visual language:
+
+Dark navy/black background
+Glassmorphism
+Purple/blue/pink/orange gradients
+Glowing elements
+Premium AI enterprise style
+Soft shadows
+Rounded cards
+Subtle animations
+
+Do NOT make it look like a generic HTML login form.
+
+The page should feel like part of the AI ORCHESTRATOR product.
+
+------------------------------------------------------------
+18. LOGIN PAGE LAYOUT
+------------------------------------------------------------
+
+Create a centered or split-screen login design.
+
+Possible structure:
+
+LEFT SIDE:
+
+AI ORCHESTRATOR branding
+
+"From Business Request to Intelligent Action"
+
+Short description:
+
+"Securely access your intelligent workflow orchestration workspace."
+
+Optional animated workflow visual.
+
+RIGHT SIDE:
+
+LOGIN CARD
+
+AI ORCHESTRATOR
+
+Welcome Back
+
+Select your role:
+
+[ Employee ] [ Manager ] [ Admin ]
+
+Username
+
+Password
+
+☐ Remember Me
+
+Forgot Password?
+
+[ Sign In ]
+
+OR
+
+[ Continue with Google ]
+
+Language selector
+
+Back to Home
+
+Keep the layout responsive.
+
+------------------------------------------------------------
+19. ROLE SELECTION
+------------------------------------------------------------
+
+The login page must clearly support:
+
+ADMIN
+MANAGER
+EMPLOYEE
+
+Example:
+
+Sign in as
+
+[ 👤 Employee ]
+
+[ 👨‍💼 Manager ]
+
+[ 🛡 Admin ]
+
+The selected role should be visually highlighted.
+
+However:
+
+DO NOT rely only on frontend role selection for security.
+
+The backend must validate the user's actual role.
+
+If a user selects:
+
+ADMIN
+
+but their account is an EMPLOYEE account:
+
+Do not grant admin access.
+
+Show an appropriate message.
+
+Example:
+
+"Your account does not have Admin access."
+
+------------------------------------------------------------
+20. USERNAME + PASSWORD
+------------------------------------------------------------
+
+The login page must contain:
+
+Username
+
+Password
+
+Username should support the project's chosen authentication identifier.
+
+If the existing system uses email addresses, support email as username.
+
+Do not remove email-based login if it already exists.
+
+Password field must include:
+
+Show password
+Hide password
+
+Use a secure password input.
+
+------------------------------------------------------------
+21. FORGOT PASSWORD
+------------------------------------------------------------
+
+Add:
+
+Forgot Password?
+
+Clicking it should navigate to:
+
+/forgot-password
+
+or equivalent.
+
+Create a separate forgot password page.
+
+Fields:
+
+Username / Email
+
+Button:
+
+Send Reset Link
+
+Show proper states:
+
+Sending...
+Reset link sent
+Invalid email
+User not found
+Try again
+
+For DEMO MODE, simulate the password reset process.
+
+Do not claim a real email was sent if no email service is configured.
+
+Instead show:
+
+"Demo reset link generated."
+
+If a real email provider is configured, use it.
+
+------------------------------------------------------------
+22. RESET PASSWORD
+------------------------------------------------------------
+
+If practical with the existing authentication system, create:
+
+/reset-password
+
+with:
+
+New Password
+Confirm Password
+
+Show password strength.
+
+Validate:
+
+Minimum length
+Password match
+Basic security requirements
+
+Then update the user's password through the backend.
+
+Do not store plaintext passwords.
+
+------------------------------------------------------------
+23. GOOGLE LOGIN
+------------------------------------------------------------
+
+Keep:
+
+Sign in with Google
+
+If real Google OAuth already exists:
+
+preserve and use it.
+
+If Google OAuth is not configured:
+
+provide a clearly labeled Demo Google Login flow.
+
+Do NOT create fake security claims.
+
+Do NOT expose credentials.
+
+============================================================
+24. AUTHENTICATION SECURITY
+============================================================
+
+Implement secure authentication.
+
+Use the existing authentication architecture if it already exists.
+
+If needed:
+
+Password hashing
+Secure session/token handling
+Protected routes
+Role-based authorization
+Backend validation
+Input validation
+Rate limiting where appropriate
+Secure cookies where applicable
+Environment variables for secrets
+
+Never store plaintext passwords.
+
+Never put secret keys in frontend source code.
+
+Never trust frontend role selection.
+
+============================================================
+25. PROTECTED APPLICATION ROUTES
+============================================================
+
+The main application should NOT be accessible without authentication.
+
+Example:
+
+Public:
+
+/
+ /login
+ /forgot-password
+ /reset-password
+
+Protected:
+
+/dashboard
+/command-center
+/requests
+/workflows
+/templates
+/custom-workflow
+/data-sources
+/analytics
+/audit
+/simulator
+/notifications
+/settings
+
+If an unauthenticated user attempts to open:
+
+/dashboard
+
+redirect them to:
+
+/login
+
+After successful login:
+
+redirect them to the correct dashboard.
+
+------------------------------------------------------------
+26. ROLE-BASED DASHBOARD REDIRECTION
+------------------------------------------------------------
+
+After login:
+
+EMPLOYEE
+→ Employee Dashboard
+
+MANAGER
+→ Manager Dashboard
+
+ADMIN
+→ Admin Dashboard
+
+All can still use the common AI ORCHESTRATOR workflow engine where permitted.
+
+Do not create three completely separate applications.
+
+Use shared components and role-based permissions.
+
+------------------------------------------------------------
+27. SESSION MANAGEMENT
+------------------------------------------------------------
+
+Implement:
+
+Login
+Logout
+Session persistence
+Session expiration
+Protected routes
+
+If Remember Me is enabled:
+
+maintain the session according to the existing secure authentication architecture.
+
+If Remember Me is disabled:
+
+use the appropriate shorter session behavior.
+
+When the user clicks:
+
+LOGOUT
+
+clear the session securely.
+
+------------------------------------------------------------
+28. LOGIN ERROR HANDLING
+------------------------------------------------------------
+
+Show useful errors.
+
+Examples:
+
+Invalid username or password.
+
+Your account does not have Manager access.
+
+Your session has expired. Please sign in again.
+
+Too many login attempts. Please try again later.
+
+Do not expose sensitive information such as whether a particular username exists unless the authentication design explicitly requires it.
+
+------------------------------------------------------------
+29. LOGIN PAGE MULTILINGUAL SUPPORT
+------------------------------------------------------------
+
+The login page itself must support the multilingual system.
+
+The language selector should be visible on the login page.
+
+Example:
+
+🌐 English ▾
+
+Changing it changes:
+
+Sign In
+Username
+Password
+Forgot Password
+Remember Me
+Admin
+Manager
+Employee
+Sign in with Google
+Back to Home
+
+etc.
+
+------------------------------------------------------------
+30. PRIVACY-FOCUSED LOGIN EXPERIENCE
+------------------------------------------------------------
+
+Make the login page feel secure and professional.
+
+Include subtle indicators such as:
+
+Secure Authentication
+Role-Based Access
+Protected Workspace
+
+But do NOT make unsupported security claims.
+
+For example, if the project actually implements role-based access:
+
+"Role-Based Access"
+
+is appropriate.
+
+Do not claim:
+
+"Military-grade encryption"
+
+unless actually implemented and verified.
+
+------------------------------------------------------------
+31. LANDING → LOGIN TRANSITION
+------------------------------------------------------------
+
+Create a smooth transition.
+
+Flow:
+
+Landing Page
+        ↓
+Click LOGIN
+        ↓
+Dedicated Login Page
+        ↓
+Select Role
+        ↓
+Username
+        ↓
+Password
+        ↓
+Authentication
+        ↓
+Role Dashboard
+
+The landing page should remain public.
+
+The actual application should be protected.
+
+------------------------------------------------------------
+32. BACK BUTTON
+------------------------------------------------------------
+
+On login page:
+
+← Back to Home
+
+should return to the landing page.
+
+Do not log the user in automatically.
+
+============================================================
+33. EXISTING FEATURES MUST REMAIN
+============================================================
+
+IMPORTANT:
+
+Do NOT remove any existing AI ORCHESTRATOR functionality.
+
+Preserve:
+
+AI Command Center
+Request Inbox
+Workflow Visualizer
+Workflow Templates
+Custom Workflow with AI
+Audit Trail
+What-if Simulator
+Workflow Digital Twin
+Dynamic Re-planning
+Failure Handling
+Human-in-the-loop Approval
+Explainable Decisions
+Priority Engine
+AI Confidence
+Smart Next Action
+SLA Engine
+Workflow Replay
+Bottleneck Detection
+Workflow Health Score
+Cross-workflow Orchestration
+Business Policy Engine
+Data Sources
+Analytics
+Notifications
+Demo Mode
+Judge Demo
+All 10 workflow types
+
+The new multilingual system and login system must integrate with these features.
+
+============================================================
+34. MULTILINGUAL + WORKFLOW INTEGRATION
+============================================================
+
+Test the multilingual feature using ALL major workflows.
+
+For example:
+
+Leave Request
+
+Hindi:
+"मुझे सोमवार को छुट्टी चाहिए।"
+
+Marathi:
+"मला सोमवारी रजा हवी आहे."
+
+English:
+"I need leave on Monday."
+
+All should map to:
+
+LEAVE_REQUEST
+
+Similarly test:
+
+Purchase Request
+Expense Reimbursement
+Customer Complaint
+IT Equipment Request
+Employee Onboarding
+Sales Discount Approval
+Vendor Approval
+Service Request
+Invoice & Payment Recovery
+
+============================================================
+35. MULTILINGUAL + AI EXPLANATION
+============================================================
+
+AI-generated explanations should follow the selected language.
+
+Example:
+
+Selected Language:
+Marathi
+
+Decision:
+
+"या विनंतीला उच्च प्राधान्य देण्यात आले आहे."
+
+Evidence:
+
+"चलन 32 दिवसांपासून थकीत आहे."
+
+Policy:
+
+"₹1,00,000 पेक्षा जास्त आणि 30 दिवसांपेक्षा जुनी चलने Finance escalation साठी पात्र आहेत."
+
+Action:
+
+"Finance Manager कडे विनंती पाठवा."
+
+============================================================
+36. MULTILINGUAL + AUDIT TRAIL
+============================================================
+
+Important:
+
+The underlying audit event data should remain structured.
+
+Example internal event:
+
+{
+  action: "WORKFLOW_CLASSIFIED",
+  workflowType: "INVOICE_RECOVERY",
+  actor: "AI_AGENT"
+}
+
+The UI can display:
+
+English:
+Workflow classified as Invoice Recovery
+
+Marathi:
+वर्कफ्लो Invoice Recovery म्हणून ओळखला गेला
+
+Do not create different audit records for every language.
+
+Language is presentation-level.
+
+============================================================
+37. MULTILINGUAL + ANALYTICS
+============================================================
+
+Analytics values should NOT change when language changes.
+
+For example:
+
+Total Requests: 25
+
+should remain:
+
+Total Requests: 25
+
+Only the label changes:
+
+English:
+Total Requests
+
+Hindi:
+कुल अनुरोध
+
+Marathi:
+एकूण विनंत्या
+
+Spanish:
+Solicitudes totales
+
+============================================================
+38. LANGUAGE-AWARE CUSTOM WORKFLOW
+============================================================
+
+The Custom Workflow with AI feature should also accept multilingual prompts.
+
+Example:
+
+English:
+
+"Create a workflow for employee travel approval."
+
+Marathi:
+
+"कर्मचारी प्रवास मंजुरीसाठी वर्कफ्लो तयार करा."
+
+Hindi:
+
+"कर्मचारी यात्रा अनुमोदन के लिए वर्कफ़्लो बनाएं।"
+
+The system should generate the same underlying workflow structure.
+
+Display the generated workflow in the user's selected language.
+
+============================================================
+39. LANGUAGE-AWARE WHAT-IF SIMULATOR
+============================================================
+
+What-if Simulator should support multilingual scenario descriptions.
+
+Example:
+
+English:
+"What if the manager rejects the request?"
+
+Hindi:
+"अगर मैनेजर अनुरोध अस्वीकार कर दे तो क्या होगा?"
+
+Marathi:
+"मॅनेजरने विनंती नाकारल्यास काय होईल?"
+
+The same simulation engine should process all of them.
+
+============================================================
+40. UI/UX QUALITY
+============================================================
+
+The multilingual selector and login page must match the existing premium AI ORCHESTRATOR UI.
+
+Use:
+
+Glassmorphism
+Gradient accents
+Smooth transitions
+Responsive design
+Accessible controls
+Clear typography
+Professional spacing
+
+Do not clutter the interface.
+
+Language selector should be easy to find but not distracting.
+
+============================================================
+41. TESTING REQUIREMENTS
+============================================================
+
+After implementation, test:
+
+LANDING
+
+[ ] Login button works
+[ ] Get Started works
+[ ] Language selector works
+[ ] Landing page translates
+
+LOGIN
+
+[ ] Login page opens separately
+[ ] Employee role works
+[ ] Manager role works
+[ ] Admin role works
+[ ] Username works
+[ ] Password works
+[ ] Show/hide password works
+[ ] Forgot password works
+[ ] Reset password works if implemented
+[ ] Google demo login works
+[ ] Login errors work
+[ ] Back to Home works
+[ ] Login page translates
+
+SECURITY
+
+[ ] Protected routes work
+[ ] Unauthenticated users cannot access dashboard
+[ ] Backend validates role
+[ ] Employee cannot access Admin-only features
+[ ] Manager permissions work
+[ ] Admin permissions work
+[ ] Logout works
+[ ] Session handling works
+
+MULTILINGUAL
+
+[ ] English works
+[ ] Hindi works
+[ ] Marathi works
+[ ] Spanish works
+[ ] Language preference persists
+[ ] Language switching does not reset workflow
+[ ] AI request can be entered in supported languages
+[ ] AI response uses selected language
+[ ] Workflow statuses translate
+[ ] Notifications translate
+[ ] Audit UI translates
+[ ] Analytics labels translate
+[ ] Custom Workflow supports multilingual input
+[ ] What-if Simulator supports multilingual input
+
+WORKFLOW
+
+[ ] Start Workflow still works
+[ ] Request Inbox still works
+[ ] Visualizer still works
+[ ] Templates still work
+[ ] Custom Workflow still works
+[ ] Simulator still works
+[ ] Audit Trail still works
+[ ] Approvals still work
+[ ] Re-planning still works
+[ ] Failure handling still works
+[ ] Demo Mode still works
+[ ] Judge Demo still works
+
+============================================================
+42. IMPORTANT IMPLEMENTATION RULE
+============================================================
+
+Do not build these features as disconnected mockups.
+
+They must be integrated into the existing application architecture.
+
+For multilingual:
+
+Frontend
+→ i18n
+→ language state
+→ AI input language
+→ workflow normalization
+→ AI response localization
+
+For authentication:
+
+Landing
+→ Login route
+→ Authentication API
+→ Database
+→ Session/token
+→ Role authorization
+→ Protected dashboard
+
+Everything must be connected.
+
+============================================================
+43. FINAL EXPECTED USER EXPERIENCE
+============================================================
+
+A new user should experience:
+
+STEP 1
+
+Open:
+
+AI ORCHESTRATOR
+
+Landing page appears.
+
+STEP 2
+
+User selects:
+
+🌐 Marathi
+
+The landing page changes to Marathi.
+
+STEP 3
+
+User clicks:
+
+LOGIN
+
+STEP 4
+
+Dedicated secure login page appears.
+
+STEP 5
+
+User selects:
+
+Employee / Manager / Admin
+
+STEP 6
+
+User enters:
+
+Username
+Password
+
+STEP 7
+
+User clicks:
+
+Sign In
+
+STEP 8
+
+Backend authenticates the user.
+
+STEP 9
+
+User is redirected to the appropriate dashboard.
+
+STEP 10
+
+User enters a request in their selected language.
+
+Example:
+
+"मला नवीन लॅपटॉपसाठी विनंती करायची आहे."
+
+STEP 11
+
+AI understands:
+
+IT EQUIPMENT REQUEST
+
+STEP 12
+
+Workflow executes using the existing AI ORCHESTRATOR engine.
+
+STEP 13
+
+The UI displays the workflow in Marathi.
+
+STEP 14
+
+All existing features continue working:
+
+Request Inbox
+Visualizer
+Audit Trail
+Notifications
+Analytics
+Approvals
+SLA
+Re-planning
+
+============================================================
+44. DO NOT BREAK EXISTING CODE
+============================================================
+
+Before modifying authentication:
+
+inspect existing auth implementation.
+
+Before modifying routing:
+
+inspect existing routing.
+
+Before modifying AI:
+
+inspect existing AI service.
+
+Before modifying workflow state:
+
+inspect existing workflow engine.
+
+Before modifying UI:
+
+inspect existing design system.
+
+Reuse existing components whenever possible.
+
+============================================================
+45. FINAL INSTRUCTION
+============================================================
+
+Do not simply explain how to add these features.
+
+ACTUALLY IMPLEMENT THEM.
+
+First inspect the existing AI ORCHESTRATOR project.
+
+Then:
+
+1. Add multilingual architecture.
+2. Add language selector.
+3. Add English, Hindi, Marathi and Spanish.
+4. Add multilingual AI request handling.
+5. Add multilingual AI responses.
+6. Add multilingual workflow UI.
+7. Add a separate login page.
+8. Add Employee / Manager / Admin login.
+9. Add username.
+10. Add password.
+11. Add show/hide password.
+12. Add Forgot Password.
+13. Add Reset Password where supported.
+14. Keep Google Login.
+15. Add secure authentication.
+16. Add protected routes.
+17. Add backend role validation.
+18. Add role-based dashboards/access.
+19. Add session handling.
+20. Integrate everything with the existing AI ORCHESTRATOR.
+
+DO NOT remove any existing features.
+
+DO NOT create fake buttons.
+
+DO NOT create disconnected demo pages.
+
+DO NOT replace the current project with a new unrelated application.
+
+Build these features directly into the existing:
+
+# AI ORCHESTRATOR
+
+"From Business Request to Intelligent Action."
+
+After implementation, run/test the application and fix any errors caused by these changes.
+
+The final result must be a polished, secure, multilingual, full-stack AI workflow orchestration platform.
+============================================================

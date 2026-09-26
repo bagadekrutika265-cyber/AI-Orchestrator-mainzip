@@ -4,13 +4,14 @@ import { BusinessPolicyEngine } from './policy.js';
 import { FailureHandlerEngine } from './failureHandler.js';
 import { WorkflowInstance, WorkflowTask, AuditLogEntry, WorkflowState } from '../types.js';
 import { WORKFLOW_TEMPLATES } from '../workflows/definitions.js';
+import { LanguageCode } from '../localization.js';
 
 export class OrchestrationEngine {
-  public static async createWorkflowFromRequest(requestText: string, requesterId: string = 'usr-2'): Promise<WorkflowInstance> {
+  public static async createWorkflowFromRequest(requestText: string, requesterId: string = 'usr-2', language: LanguageCode = 'en'): Promise<WorkflowInstance> {
     const user = db.users.find(u => u.id === requesterId) || db.users[1];
     
     // Step 1: Request Understanding
-    const understanding = await AIService.processRequest(requestText);
+    const understanding = await AIService.processRequest(requestText, language);
     
     // Step 2: Route to template or generate dynamic plan
     const template = WORKFLOW_TEMPLATES.find(t => t.name.toLowerCase() === understanding.suggestedWorkflow.toLowerCase()) || WORKFLOW_TEMPLATES[0];
@@ -81,7 +82,8 @@ export class OrchestrationEngine {
         approverRole: policyResult.approvalRole || 'Manager',
         status: policyResult.requiresApproval ? 'PENDING' : 'APPROVED',
         reason: policyResult.reason
-      }
+      },
+      metadata: { language: understanding.detectedLanguage || language, internalWorkflow: template.name }
     };
 
     // Save to DB

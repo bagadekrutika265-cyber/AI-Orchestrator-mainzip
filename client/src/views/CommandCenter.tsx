@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Terminal, Send, Sparkles, ArrowRight, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
 import { UnderstandingResult } from '../types';
+import { useI18n } from '../i18n';
 
 interface CommandCenterProps {
   onSubmitRequest: (text: string) => void;
@@ -11,6 +12,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   onSubmitRequest,
   onUnderstandText,
 }) => {
+  const { t, language } = useI18n();
   const [requestText, setRequestText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [understanding, setUnderstanding] = useState<UnderstandingResult | null>(null);
@@ -71,13 +73,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 text-brand-300 border border-brand-500/30 text-xs font-bold">
           <Terminal className="w-3.5 h-3.5 text-brand-400" />
-          <span>CENTRAL AI COMMAND CENTER</span>
+         <span>{t('command.eyebrow')}</span>
         </div>
         <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
-          What would you like to accomplish?
+           {t('command.title')}
         </h1>
         <p className="text-sm text-gray-400 max-w-xl mx-auto">
-          State your business request in natural language. AI Orchestrator will automatically classify the workflow, gather context, evaluate policies, generate a multi-step plan, and manage execution.
+           {t('command.description')}
         </p>
       </div>
 
@@ -87,14 +89,14 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           <textarea
             value={requestText}
             onChange={handleTextChange}
-            placeholder="Describe your business request (e.g., 'Find overdue invoices above ₹50,000 and recover the payments.')..."
+             placeholder={t('command.placeholder')}
             rows={4}
             className="w-full bg-dark-base border border-dark-border rounded-xl p-4 text-base text-gray-100 placeholder-gray-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition resize-none font-sans"
           />
           {isAnalyzing && (
             <div className="absolute top-3 right-3 flex items-center gap-2 text-xs text-brand-400 font-semibold bg-dark-card px-2.5 py-1 rounded-md border border-dark-border">
               <Sparkles className="w-3.5 h-3.5 animate-spin-slow" />
-              <span>Analyzing Request...</span>
+               <span>{t('command.analyzing')}</span>
             </div>
           )}
         </div>
@@ -105,32 +107,32 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-brand-400">
               <span className="flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-brand-400" />
-                AI Understanding & Entity Extraction
+                 {t('command.understanding')}
               </span>
               <span className="px-2 py-0.5 rounded bg-brand-500/20 text-brand-300 font-mono">
-                {understanding.confidenceScore}% Confidence
+                 {understanding.confidenceScore}% {t('command.confidence')}
               </span>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
               <div className="bg-dark-base p-2.5 rounded-lg border border-dark-border">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Detected Workflow</span>
+                 <span className="text-gray-400 block text-[10px] uppercase font-bold">{t('command.workflow')}</span>
                 <span className="font-bold text-white">{understanding.suggestedWorkflow}</span>
               </div>
               <div className="bg-dark-base p-2.5 rounded-lg border border-dark-border">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Priority</span>
+                 <span className="text-gray-400 block text-[10px] uppercase font-bold">{t('command.priority')}</span>
                 <span className={`font-bold ${understanding.priority === 'CRITICAL' ? 'text-rose-400' : 'text-amber-400'}`}>
                   {understanding.priority}
                 </span>
               </div>
               <div className="bg-dark-base p-2.5 rounded-lg border border-dark-border">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Intent</span>
+                 <span className="text-gray-400 block text-[10px] uppercase font-bold">{t('command.intent')}</span>
                 <span className="font-semibold text-gray-200 truncate block">{understanding.intent}</span>
               </div>
               <div className="bg-dark-base p-2.5 rounded-lg border border-dark-border">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Missing Info</span>
+                 <span className="text-gray-400 block text-[10px] uppercase font-bold">{t('command.missing')}</span>
                 <span className="font-semibold text-emerald-400">
-                  {understanding.missingInformation.length > 0 ? understanding.missingInformation.join(', ') : 'None (Complete)'}
+                   {understanding.missingInformation.length > 0 ? understanding.missingInformation.join(', ') : t('command.noneComplete')}
                 </span>
               </div>
             </div>
@@ -140,14 +142,14 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         {/* Submit Button */}
         <div className="flex items-center justify-between pt-2">
           <span className="text-xs text-gray-400 hidden sm:inline">
-            No manual workflow configuration required &bull; Auto Router Enabled
+             {t('command.autoRouter')}
           </span>
           <button
             type="submit"
             disabled={!requestText.trim()}
             className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 text-white font-bold text-sm shadow-xl shadow-brand-600/30 hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 transition-all ml-auto"
           >
-            <span>START WORKFLOW</span>
+             <span>{t('command.start')}</span>
             <Send className="w-4 h-4" />
           </button>
         </div>
@@ -156,7 +158,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       {/* Sample Request Prompts Chips */}
       <div className="space-y-3">
         <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 px-1">
-          Example Business Requests (Click to Test):
+           {t('command.examples')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
           {samplePrompts.map((prompt, idx) => (
@@ -171,6 +173,17 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           ))}
         </div>
       </div>
+      {understanding?.detectedLanguage && (
+        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-xs text-cyan-200">
+          {t('command.detectedLanguage')}: <span className="font-bold uppercase">{understanding.detectedLanguage}</span> · {language.toUpperCase()} presentation
+          {understanding.aiResponse && (
+            <div className="mt-2 space-y-1 text-gray-200">
+              <p>{understanding.aiResponse.summary}</p>
+              <p className="text-cyan-100">{understanding.aiResponse.nextAction}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

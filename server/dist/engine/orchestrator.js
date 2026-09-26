@@ -7,10 +7,10 @@ const policy_js_1 = require("./policy.js");
 const failureHandler_js_1 = require("./failureHandler.js");
 const definitions_js_1 = require("../workflows/definitions.js");
 class OrchestrationEngine {
-    static async createWorkflowFromRequest(requestText, requesterId = 'usr-2') {
+    static async createWorkflowFromRequest(requestText, requesterId = 'usr-2', language = 'en') {
         const user = dataStore_js_1.db.users.find(u => u.id === requesterId) || dataStore_js_1.db.users[1];
         // Step 1: Request Understanding
-        const understanding = await aiService_js_1.AIService.processRequest(requestText);
+        const understanding = await aiService_js_1.AIService.processRequest(requestText, language);
         // Step 2: Route to template or generate dynamic plan
         const template = definitions_js_1.WORKFLOW_TEMPLATES.find(t => t.name.toLowerCase() === understanding.suggestedWorkflow.toLowerCase()) || definitions_js_1.WORKFLOW_TEMPLATES[0];
         const now = new Date();
@@ -74,7 +74,8 @@ class OrchestrationEngine {
                 approverRole: policyResult.approvalRole || 'Manager',
                 status: policyResult.requiresApproval ? 'PENDING' : 'APPROVED',
                 reason: policyResult.reason
-            }
+            },
+            metadata: { language: understanding.detectedLanguage || language, internalWorkflow: template.name }
         };
         // Save to DB
         dataStore_js_1.db.workflows.unshift(newWorkflow);

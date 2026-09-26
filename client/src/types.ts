@@ -24,6 +24,7 @@ export interface User {
   role: UserRole;
   department: string;
   avatar?: string;
+  language?: 'en' | 'hi' | 'mr' | 'es';
 }
 
 export interface WorkflowTask {
@@ -128,4 +129,9 @@ export interface UnderstandingResult {
   confidenceScore: number;
   confidenceReason: string;
   nextAction: string;
+  detectedLanguage?: 'en' | 'hi' | 'mr' | 'es';
+  aiResponse?: {
+    summary: string;
+    nextAction: string;
+  };
 }

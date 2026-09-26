@@ -1,4 +1,5 @@
 import { User, WorkflowInstance, AuditLogEntry, PolicyRule, WorkflowTemplate } from '../types.js';
+import { makeDemoPasswordHash } from '../auth.js';
 
 export interface Customer {
   id: string;
@@ -77,11 +78,11 @@ class DataStore {
   private seedAllData() {
     // Seed Users
     this.users = [
-      { id: 'usr-1', name: 'Alexander Vance', email: 'alexander@acme.com', role: 'ADMIN', department: 'Executive', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
-      { id: 'usr-2', name: 'Sarah Jenkins', email: 'sarah.j@acme.com', role: 'MANAGER', department: 'Finance', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
-      { id: 'usr-3', name: 'David Miller', email: 'david.m@acme.com', role: 'EMPLOYEE', department: 'Engineering', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
-      { id: 'usr-4', name: 'Elena Rostova', email: 'elena.r@acme.com', role: 'MANAGER', department: 'HR', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150' },
-      { id: 'usr-5', name: 'Marcus Sterling', email: 'marcus.s@acme.com', role: 'MANAGER', department: 'Procurement', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' }
+      { id: 'usr-1', name: 'Alexander Vance', email: 'alexander@acme.com', role: 'ADMIN', department: 'Executive', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', language: 'en', passwordHash: makeDemoPasswordHash() },
+      { id: 'usr-2', name: 'Sarah Jenkins', email: 'sarah.j@acme.com', role: 'MANAGER', department: 'Finance', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', language: 'en', passwordHash: makeDemoPasswordHash() },
+      { id: 'usr-3', name: 'David Miller', email: 'david.m@acme.com', role: 'EMPLOYEE', department: 'Engineering', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', language: 'en', passwordHash: makeDemoPasswordHash() },
+      { id: 'usr-4', name: 'Elena Rostova', email: 'elena.r@acme.com', role: 'MANAGER', department: 'HR', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150', language: 'en', passwordHash: makeDemoPasswordHash() },
+      { id: 'usr-5', name: 'Marcus Sterling', email: 'marcus.s@acme.com', role: 'MANAGER', department: 'Procurement', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', language: 'en', passwordHash: makeDemoPasswordHash() }
     ];
 
     // Seed 20+ Employees

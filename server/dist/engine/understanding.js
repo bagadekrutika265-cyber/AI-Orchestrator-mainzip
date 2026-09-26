@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RequestUnderstandingEngine = void 0;
+const localization_js_1 = require("../localization.js");
 class RequestUnderstandingEngine {
-    static understand(requestText) {
-        const textLower = requestText.toLowerCase();
+    static understand(requestText, preferredLanguage = 'en') {
+        const detectedLanguage = (0, localization_js_1.detectLanguage)(requestText, preferredLanguage);
+        const textLower = (0, localization_js_1.normalizeForClassification)(requestText, detectedLanguage);
         // Workflow Classification Rules
         let suggestedWorkflow = 'Invoice & Payment Recovery';
         let requestType = 'Invoice & Payment Recovery';
@@ -120,6 +122,12 @@ class RequestUnderstandingEngine {
             entities.issueCategory = 'Network Outage';
             requiredInfo.push('Incident Scope', 'Assigned Network Engineer', 'SLA Clock (4h)');
         }
+        const responseCopy = {
+            en: { summary: 'Your request has been understood and mapped to the common workflow engine.', nextAction: `Next action: initiate ${suggestedWorkflow}.` },
+            hi: { summary: 'आपके अनुरोध को समझकर साझा वर्कफ़्लो इंजन से जोड़ा गया है।', nextAction: `अगली कार्रवाई: ${suggestedWorkflow} शुरू करें।` },
+            mr: { summary: 'तुमची विनंती समजून सामायिक वर्कफ्लो इंजिनशी जोडली आहे.', nextAction: `पुढील कृती: ${suggestedWorkflow} सुरू करा. ` },
+            es: { summary: 'Tu solicitud se ha entendido y se ha asignado al motor de flujos común.', nextAction: `Siguiente acción: iniciar ${suggestedWorkflow}.` },
+        };
         return {
             requestType,
             intent,
@@ -132,7 +140,9 @@ class RequestUnderstandingEngine {
             suggestedWorkflow,
             confidenceScore,
             confidenceReason: `High entity overlap with domain blueprint '${suggestedWorkflow}' (${confidenceScore}% match confidence)`,
-            nextAction: missingInfo.length > 0 ? `Ask user for required missing information: ${missingInfo.join(', ')}` : `Initiate ${suggestedWorkflow} execution plan`
+            nextAction: missingInfo.length > 0 ? `Ask user for required missing information: ${missingInfo.join(', ')}` : `Initiate ${suggestedWorkflow} execution plan`,
+            detectedLanguage,
+            aiResponse: responseCopy[detectedLanguage],
         };
     }
 }

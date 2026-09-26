@@ -6,6 +6,8 @@ const orchestrator_js_1 = require("../engine/orchestrator.js");
 const aiService_js_1 = require("../ai/aiService.js");
 const simulators_js_1 = require("../engine/simulators.js");
 const definitions_js_1 = require("../workflows/definitions.js");
+const auth_js_1 = require("../auth.js");
+const localization_js_1 = require("../localization.js");
 const router = (0, express_1.Router)();
 // Health check
 router.get('/health', (req, res) => {
@@ -18,19 +20,106 @@ router.get('/health', (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
+// Public authentication endpoints
+router.get('/auth/me', (req, res) => {
+    const userId = (0, auth_js_1.getSessionUserId)(req);
+    const user = userId ? dataStore_js_1.db.users.find((candidate) => candidate.id === userId) : undefined;
+    if (!user) {
+        res.json({ authenticated: false });
+        return;
+    }
+    res.json({ authenticated: true, user: (0, auth_js_1.safeUser)(user) });
+});
+router.post('/auth/login', (req, res) => {
+    const { username, password, role, rememberMe } = req.body;
+    const user = dataStore_js_1.db.users.find((candidate) => candidate.email.toLowerCase() === String(username || '').trim().toLowerCase());
+    if (!user || !user.passwordHash || !password || !(0, auth_js_1.verifyPassword)(password, user.passwordHash)) {
+        res.status(401).json({ error: 'Invalid username or password.', code: 'INVALID_CREDENTIALS' });
+        return;
+    }
+    if (!(0, auth_js_1.isSupportedRole)(role || '') || user.role !== role) {
+        res.status(403).json({ error: `Your account does not have ${String(role || 'selected')} access.`, code: 'ROLE_MISMATCH' });
+        return;
+    }
+    (0, auth_js_1.createSession)(res, user.id, Boolean(rememberMe));
+    res.json({ success: true, user: (0, auth_js_1.safeUser)(user) });
+});
+router.post('/auth/google-demo', (req, res) => {
+    const user = dataStore_js_1.db.users[2];
+    (0, auth_js_1.createSession)(res, user.id, true);
+    res.json({ success: true, demo: true, user: (0, auth_js_1.safeUser)(user) });
+});
+router.post('/auth/logout', (req, res) => {
+    (0, auth_js_1.clearSession)(req, res);
+    res.json({ success: true });
+});
+router.post('/auth/forgot-password', (req, res) => {
+    const username = String(req.body?.username || '').trim().toLowerCase();
+    const user = dataStore_js_1.db.users.find((candidate) => candidate.email.toLowerCase() === username);
+    // Keep the response useful in demo mode without claiming an email was sent.
+    if (!user) {
+        res.status(404).json({ error: 'User not found. Try again.', code: 'USER_NOT_FOUND' });
+        return;
+    }
+    const token = (0, auth_js_1.createResetToken)(user.id);
+    res.json({
+        success: true,
+        demo: true,
+        message: 'Demo reset link generated.',
+        resetToken: process.env.NODE_ENV === 'production' ? undefined : token,
+    });
+});
+router.post('/auth/reset-password', (req, res) => {
+    const { token, password, confirmPassword } = req.body;
+    if (!token || !password || password.length < 8) {
+        res.status(400).json({ error: 'Password must be at least 8 characters.' });
+        return;
+    }
+    if (password !== confirmPassword) {
+        res.status(400).json({ error: 'Passwords do not match.' });
+        return;
+    }
+    const userId = (0, auth_js_1.consumeResetToken)(token);
+    const user = userId ? dataStore_js_1.db.users.find((candidate) => candidate.id === userId) : undefined;
+    if (!user) {
+        res.status(400).json({ error: 'This reset link is invalid or expired.' });
+        return;
+    }
+    user.passwordHash = (0, auth_js_1.hashPassword)(password);
+    res.json({ success: true, message: 'Password updated. You can now sign in.' });
+});
+// Everything below this point requires an authenticated session.
+router.use(auth_js_1.requireAuth);
+router.get('/auth/preferences', (req, res) => {
+    const userId = (0, auth_js_1.getSessionUserId)(req);
+    const user = dataStore_js_1.db.users.find((candidate) => candidate.id === userId);
+    res.json({ language: user?.language || 'en' });
+});
+router.patch('/auth/preferences', (req, res) => {
+    const language = req.body?.language;
+    const userId = (0, auth_js_1.getSessionUserId)(req);
+    const user = dataStore_js_1.db.users.find((candidate) => candidate.id === userId);
+    if (!user || !localization_js_1.supportedLanguages.includes(language)) {
+        res.status(400).json({ error: 'Unsupported language preference.' });
+        return;
+    }
+    user.language = language;
+    res.json({ success: true, language });
+});
 // Users / Roles
 router.get('/users', (req, res) => {
-    res.json(dataStore_js_1.db.users);
+    res.json(dataStore_js_1.db.users.map(auth_js_1.safeUser));
 });
 // Submit natural language request -> Creates & Starts Workflow
 router.post('/requests', async (req, res) => {
     try {
-        const { requestText, requesterId } = req.body;
+        const { requestText, requesterId, language } = req.body;
         if (!requestText) {
             res.status(400).json({ error: 'requestText is required' });
             return;
         }
-        const workflow = await orchestrator_js_1.OrchestrationEngine.createWorkflowFromRequest(requestText, requesterId);
+        const sessionUserId = (0, auth_js_1.getSessionUserId)(req);
+        const workflow = await orchestrator_js_1.OrchestrationEngine.createWorkflowFromRequest(requestText, requesterId || sessionUserId || undefined, language || 'en');
         res.status(201).json({ success: true, workflow });
     }
     catch (err) {
@@ -52,8 +141,14 @@ router.get('/workflows/:id', (req, res) => {
 // Workflow Actions: Approve
 router.post('/workflows/:id/approve', (req, res) => {
     try {
+        const sessionUserId = (0, auth_js_1.getSessionUserId)(req);
+        const actingUser = dataStore_js_1.db.users.find((candidate) => candidate.id === sessionUserId);
+        if (!actingUser || !(0, auth_js_1.roleCanApprove)(actingUser.role)) {
+            res.status(403).json({ error: 'Manager or Admin access is required to approve workflows.', code: 'ROLE_FORBIDDEN' });
+            return;
+        }
         const { approverName, comments } = req.body;
-        const wf = orchestrator_js_1.OrchestrationEngine.approveWorkflow(req.params.id, approverName, comments);
+        const wf = orchestrator_js_1.OrchestrationEngine.approveWorkflow(req.params.id, actingUser.name || approverName, comments);
         res.json({ success: true, workflow: wf });
     }
     catch (err) {
@@ -63,8 +158,14 @@ router.post('/workflows/:id/approve', (req, res) => {
 // Workflow Actions: Reject
 router.post('/workflows/:id/reject', (req, res) => {
     try {
+        const sessionUserId = (0, auth_js_1.getSessionUserId)(req);
+        const actingUser = dataStore_js_1.db.users.find((candidate) => candidate.id === sessionUserId);
+        if (!actingUser || !(0, auth_js_1.roleCanApprove)(actingUser.role)) {
+            res.status(403).json({ error: 'Manager or Admin access is required to reject workflows.', code: 'ROLE_FORBIDDEN' });
+            return;
+        }
         const { approverName, reason } = req.body;
-        const wf = orchestrator_js_1.OrchestrationEngine.rejectWorkflow(req.params.id, approverName, reason);
+        const wf = orchestrator_js_1.OrchestrationEngine.rejectWorkflow(req.params.id, actingUser.name || approverName, reason);
         res.json({ success: true, workflow: wf });
     }
     catch (err) {
@@ -121,15 +222,15 @@ router.post('/templates', (req, res) => {
 });
 // AI NLP Understanding Test
 router.post('/ai/understand', async (req, res) => {
-    const { requestText } = req.body;
-    const result = await aiService_js_1.AIService.processRequest(requestText || 'I need a new laptop');
+    const { requestText, language } = req.body;
+    const result = await aiService_js_1.AIService.processRequest(requestText || 'I need a new laptop', language || 'en');
     res.json(result);
 });
 // What-If Simulator Endpoint
 router.post('/ai/what-if', (req, res) => {
-    const { question } = req.body;
+    const { question, language } = req.body;
     const prediction = simulators_js_1.SimulatorEngine.runWhatIf(question || 'What if customer does not respond?');
-    res.json(prediction);
+    res.json({ ...prediction, language: language || 'en' });
 });
 // Digital Twin Pre-Execution Simulation Endpoint
 router.post('/ai/digital-twin', (req, res) => {

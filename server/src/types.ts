@@ -16,6 +16,7 @@ export type WorkflowState =
 
 export type PriorityLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type UserRole = 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+export type LanguageCode = 'en' | 'hi' | 'mr' | 'es';
 
 export interface User {
   id: string;
@@ -24,6 +25,8 @@ export interface User {
   role: UserRole;
   department: string;
   avatar?: string;
+  language?: LanguageCode;
+  passwordHash?: string;
 }
 
 export interface WorkflowTask {
@@ -139,4 +142,9 @@ export interface UnderstandingResult {
   confidenceScore: number;
   confidenceReason: string;
   nextAction: string;
+  detectedLanguage?: LanguageCode;
+  aiResponse?: {
+    summary: string;
+    nextAction: string;
+  };
 }

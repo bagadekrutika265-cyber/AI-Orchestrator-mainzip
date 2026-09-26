@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # AI ORCHESTRATOR
 ## Intelligent Business Workflow Automation Platform
 
@@ -92,7 +91,26 @@ npm run dev
    - **Step 4**: Click **Simulate Payment Settlement** → Watch state transition to `RESOLVED` & update audit log.
    - **Step 5**: Runs `"New employee joins next Monday."` to demonstrate cross-department onboarding.
    - **Step 6**: Runs `"Give ABC Corp a 20% discount."` to demonstrate tiered sales discount policies.
-=======
-# AI-Orchestrator
-This is our final round hackathon project
->>>>>>> ac937732f981f83be2d728f0512e6c6f7e10b6bc
+
+## Multilingual access and authentication
+
+The public landing page is available at `/`. The application is protected behind `/login`.
+English, Hindi, Marathi, and Spanish are available from the language selector. The selected
+language is persisted locally and, after sign-in, on the demo user profile.
+
+The local demo authentication flow uses hashed passwords and an HTTP-only session cookie.
+All seeded demo accounts use the password `Demo@123`:
+
+| Role | Username |
+| --- | --- |
+| Admin | `alexander@acme.com` |
+| Manager | `sarah.j@acme.com` |
+| Employee | `david.m@acme.com` |
+
+Role selection is validated by the backend. Approval endpoints require a manager or admin
+session. The forgot-password flow deliberately returns a demo reset token instead of claiming
+that an email was sent, because no email provider is configured.
+
+Public routes: `/`, `/login`, `/forgot-password`, `/reset-password`.
+Authenticated application views are served through the shared React shell and redirect
+unauthenticated visitors back to `/login`.

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { WorkflowInstance, WorkflowTask } from '../types';
 import { GitMerge, CheckCircle2, Clock, AlertTriangle, ShieldCheck, UserCheck, RefreshCw, Zap, ArrowRight, Play, Database, FileText } from 'lucide-react';
 import { FailureSimulatorPanel } from '../components/FailureSimulatorPanel';
+import { useI18n } from '../i18n';
 
 interface ExecutionViewProps {
   workflow: WorkflowInstance;
@@ -16,15 +17,16 @@ export const ExecutionView: React.FC<ExecutionViewProps> = ({
   onReject,
   onInjectEvent,
 }) => {
+  const { t } = useI18n();
   const [selectedTask, setSelectedTask] = useState<WorkflowTask | null>(workflow.tasks[0] || null);
 
   const getTaskBadge = (task: WorkflowTask) => {
-    if (task.status === 'COMPLETED') return <span className="text-emerald-400 flex items-center gap-1 font-bold">✓ Completed</span>;
-    if (task.status === 'RUNNING') return <span className="text-amber-400 flex items-center gap-1 font-bold">⟳ Running</span>;
-    if (task.status === 'WAITING') return <span className="text-cyan-400 flex items-center gap-1 font-bold">⏸ Waiting</span>;
-    if (task.status === 'FAILED') return <span className="text-rose-400 flex items-center gap-1 font-bold">⚠ Failed</span>;
-    if (task.status === 'REPLANNED') return <span className="text-orange-400 flex items-center gap-1 font-bold">🔄 Re-planned</span>;
-    return <span className="text-gray-400 font-bold">Pending</span>;
+     if (task.status === 'COMPLETED') return <span className="text-emerald-400 flex items-center gap-1 font-bold">✓ {t('status.COMPLETED')}</span>;
+     if (task.status === 'RUNNING') return <span className="text-amber-400 flex items-center gap-1 font-bold">⟳ {t('status.RUNNING')}</span>;
+     if (task.status === 'WAITING') return <span className="text-cyan-400 flex items-center gap-1 font-bold">⏸ {t('status.WAITING')}</span>;
+     if (task.status === 'FAILED') return <span className="text-rose-400 flex items-center gap-1 font-bold">⚠ {t('status.FAILED')}</span>;
+     if (task.status === 'REPLANNED') return <span className="text-orange-400 flex items-center gap-1 font-bold">🔄 {t('status.REPLANNED')}</span>;
+     return <span className="text-gray-400 font-bold">{t('status.PENDING')}</span>;
   };
 
   const getExecutionTypeBadge = (type?: string) => {
@@ -46,7 +48,7 @@ export const ExecutionView: React.FC<ExecutionViewProps> = ({
             <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${
               workflow.state === 'RESOLVED' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'
             }`}>
-              {workflow.state}
+              {t(`status.${workflow.state}`)}
             </span>
             {workflow.replannedCount > 0 && (
               <span className="px-2.5 py-0.5 rounded bg-orange-500/20 text-orange-300 text-[10px] font-bold border border-orange-500/30 animate-pulse">

@@ -1,6 +1,8 @@
 import React from 'react';
 import { UserRole } from '../types';
 import { Cpu, Play, Shield, Bell, Sparkles, UserCheck } from 'lucide-react';
+import { LanguageSelector } from './LanguageSelector';
+import { useI18n } from '../i18n';
 
 interface NavbarProps {
   currentRole: UserRole;
@@ -9,6 +11,8 @@ interface NavbarProps {
   onStartJudgeDemo: () => void;
   onOpenNotifications: () => void;
   unreadCount: number;
+  onLogout: () => void;
+  userName: string;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -18,7 +22,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   onStartJudgeDemo,
   onOpenNotifications,
   unreadCount,
+  onLogout,
+  userName,
 }) => {
+  const { t } = useI18n();
   return (
     <header className="sticky top-0 z-40 bg-dark-surface/90 backdrop-blur-md border-b border-dark-border px-6 py-3 flex items-center justify-between shadow-xl">
       {/* Brand Logo & Taglines */}
@@ -47,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="group relative inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-200"
         >
           <Play className="w-4 h-4 fill-current group-hover:animate-bounce" />
-          <span>START JUDGE DEMO</span>
+           <span>{t('nav.judgeDemo')}</span>
           <span className="absolute -top-1 -right-1 flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-300"></span>
@@ -61,28 +68,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             : 'bg-amber-950/40 text-amber-400 border-amber-500/40'
         }`}>
           <Sparkles className="w-3.5 h-3.5" />
-          <span>{aiMode === 'LIVE_AI_MODE' ? 'LIVE AI MODE' : 'DEMO MODE'}</span>
+          <span>{aiMode === 'LIVE_AI_MODE' ? t('nav.liveAi') : t('nav.demoMode')}</span>
         </div>
 
-        {/* Role Switcher Selector */}
         <div className="relative flex items-center bg-dark-card border border-dark-border rounded-lg p-1 text-xs font-medium">
           <UserCheck className="w-3.5 h-3.5 ml-2 text-gray-400" />
-          <select
-            value={currentRole}
-            onChange={(e) => onRoleChange(e.target.value as UserRole)}
-            className="bg-transparent text-gray-200 px-2 py-1 focus:outline-none cursor-pointer font-semibold"
-          >
-            <option value="ADMIN" className="bg-dark-card text-white">Role: ADMIN</option>
-            <option value="MANAGER" className="bg-dark-card text-white">Role: MANAGER</option>
-            <option value="EMPLOYEE" className="bg-dark-card text-white">Role: EMPLOYEE</option>
-          </select>
+          <span className="px-2 py-1 font-semibold text-gray-200">{userName} · {currentRole}</span>
         </div>
+
+        <LanguageSelector compact />
 
         {/* Notifications Bell */}
         <button
           onClick={onOpenNotifications}
           className="relative p-2 rounded-lg bg-dark-card border border-dark-border text-gray-300 hover:text-white hover:bg-dark-hover transition"
-          title="Notifications"
+           title={t('nav.notifications')}
         >
           <Bell className="w-4 h-4" />
           {unreadCount > 0 && (
@@ -90,6 +90,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               {unreadCount}
             </span>
           )}
+        </button>
+        <button onClick={onLogout} className="hidden rounded-lg border border-dark-border bg-dark-card px-3 py-2 text-xs font-bold text-gray-300 transition hover:border-rose-400/50 hover:text-white sm:block">
+          {t('auth.logout')}
         </button>
       </div>
     </header>

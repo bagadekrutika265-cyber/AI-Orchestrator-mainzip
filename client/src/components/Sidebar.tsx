@@ -17,6 +17,7 @@ import {
   Settings,
   Bell
 } from 'lucide-react';
+import { useI18n } from '../i18n';
 
 export type ViewId =
   | 'landing'
@@ -47,36 +48,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectView,
   pendingApprovalsCount,
 }) => {
+  const { t } = useI18n();
   const menuItems = [
-    { id: 'landing', label: 'Landing Page', icon: Home, category: 'Main' },
-    { id: 'command-center', label: 'AI Command Center', icon: Terminal, category: 'Main', badge: 'Core' },
-    { id: 'dashboard', label: 'Operations Dashboard', icon: LayoutDashboard, category: 'Main' },
-    { id: 'inbox', label: 'Request Inbox', icon: Inbox, category: 'Main' },
-    { id: 'execution', label: 'Workflow Visualizer', icon: GitMerge, category: 'Main' },
-    { id: 'approvals', label: 'Approval Center', icon: CheckSquare, category: 'Main', badgeCount: pendingApprovalsCount },
+    { id: 'landing', label: t('nav.landing'), icon: Home, category: 'Main' },
+    { id: 'command-center', label: t('nav.commandCenter'), icon: Terminal, category: 'Main', badge: 'Core' },
+    { id: 'dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, category: 'Main' },
+    { id: 'inbox', label: t('nav.inbox'), icon: Inbox, category: 'Main' },
+    { id: 'execution', label: t('nav.visualizer'), icon: GitMerge, category: 'Main' },
+    { id: 'approvals', label: t('nav.approvals'), icon: CheckSquare, category: 'Main', badgeCount: pendingApprovalsCount },
     
-    { id: 'templates', label: 'Workflow Templates (10)', icon: FileText, category: 'Orchestration' },
-    { id: 'custom-generator', label: 'AI Workflow Builder', icon: Wand2, category: 'Orchestration' },
-    { id: 'datasources', label: 'Data Sources (Multi-source)', icon: Database, category: 'Orchestration' },
+    { id: 'templates', label: t('nav.templates'), icon: FileText, category: 'Orchestration' },
+    { id: 'custom-generator', label: t('nav.builder'), icon: Wand2, category: 'Orchestration' },
+    { id: 'datasources', label: t('nav.dataSources'), icon: Database, category: 'Orchestration' },
     
-    { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3, category: 'Insights' },
-    { id: 'audit', label: 'Audit Trail & Logs', icon: History, category: 'Insights' },
-    { id: 'what-if', label: 'What-If Simulator', icon: HelpCircle, category: 'Simulation' },
-    { id: 'digital-twin', label: 'Workflow Digital Twin', icon: Activity, category: 'Simulation' },
-    { id: 'failure-simulator', label: 'Failure Simulator', icon: AlertTriangle, category: 'Simulation', badge: 'Live Demo' },
+    { id: 'analytics', label: t('nav.analytics'), icon: BarChart3, category: 'Insights' },
+    { id: 'audit', label: t('nav.audit'), icon: History, category: 'Insights' },
+    { id: 'what-if', label: t('nav.whatIf'), icon: HelpCircle, category: 'Simulation' },
+    { id: 'digital-twin', label: t('nav.digitalTwin'), icon: Activity, category: 'Simulation' },
+    { id: 'failure-simulator', label: t('nav.failureSimulator'), icon: AlertTriangle, category: 'Simulation', badge: 'Live Demo' },
     
-    { id: 'settings', label: 'Policies & Settings', icon: Settings, category: 'System' },
+    { id: 'settings', label: t('nav.settings'), icon: Settings, category: 'System' },
   ];
 
   return (
     <aside className="w-64 bg-dark-surface border-r border-dark-border flex flex-col h-[calc(100vh-61px)] shrink-0 overflow-y-auto">
       <div className="p-4 space-y-6">
-        {['Main', 'Orchestration', 'Insights', 'Simulation', 'System'].map((cat) => {
+        {[['Main', 'main'], ['Orchestration', 'orchestration'], ['Insights', 'insights'], ['Simulation', 'simulation'], ['System', 'system']].map(([cat, catKey]) => {
           const items = menuItems.filter((i) => i.category === cat);
           return (
             <div key={cat} className="space-y-1">
               <h3 className="px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                {cat}
+               {t(`nav.${catKey}`)}
               </h3>
               {items.map((item) => {
                 const Icon = item.icon;
@@ -126,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div>
             <p className="text-xs font-bold text-white">Hackathon Engine</p>
-            <p className="text-[10px] text-emerald-400 font-mono">● Engine Operational</p>
+             <p className="text-[10px] text-emerald-400 font-mono">● {t('nav.engine')}</p>
           </div>
         </div>
       </div>

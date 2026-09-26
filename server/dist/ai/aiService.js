@@ -9,7 +9,7 @@ class AIService {
         }
         return 'DEMO_MODE';
     }
-    static async processRequest(requestText) {
+    static async processRequest(requestText, language = 'en') {
         const mode = this.getMode();
         console.log(`[AI Service] Processing request in ${mode}...`);
         if (mode === 'LIVE_AI_MODE' && process.env.GEMINI_API_KEY) {
@@ -54,7 +54,7 @@ class AIService {
             }
         }
         // Fallback to deterministic, reliable Demo Engine
-        return understanding_js_1.RequestUnderstandingEngine.understand(requestText);
+        return understanding_js_1.RequestUnderstandingEngine.understand(requestText, language);
     }
 }
 exports.AIService = AIService;
